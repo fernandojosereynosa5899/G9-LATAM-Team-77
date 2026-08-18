@@ -32,18 +32,16 @@ const currentPath = pathname.replace(/^\/|\/$/g, '');
             <span id="backendStatusText">Backend...</span>
         </div>
 
-        <!-- Auth Button (Hidden on /login) -->
-        {currentPath !== 'login' && (
-            <a href="/login" id="authNavBtn"
-                class="text-xs font-semibold px-3.5 py-1.5 bg-black hover:bg-gray-800 text-white rounded-lg transition-colors">
-                Iniciar Sesión
-            </a>
-        )}
+        <!-- Auth Button (solo visible cuando hay sesión activa, controlado por JS) -->
+        <button type="button" id="authNavBtn"
+            class="hidden text-xs font-semibold px-3.5 py-1.5 bg-gray-200 dark:bg-gray-700 hover:bg-red-600 hover:text-white text-gray-800 dark:text-gray-200 rounded-lg transition-colors cursor-pointer">
+            Cerrar Sesión
+        </button>
 
         <!-- Dark mode toggle -->
         <button id="themeToggle"
             aria-label="Cambiar tema"
-            class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300">
+            class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300 cursor-pointer">
             <!-- Sun icon (dark mode) -->
             <svg id="iconSun" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -82,15 +80,12 @@ const currentPath = pathname.replace(/^\/|\/$/g, '');
             mainNav.classList.add('md:flex');
         }
         if (authNavBtn) {
-            authNavBtn.textContent = 'Cerrar Sesión';
-            authNavBtn.className = 'text-xs font-semibold px-3 py-1.5 bg-gray-200 dark:bg-gray-700 hover:bg-red-600 hover:text-white text-gray-800 dark:text-gray-200 rounded-lg transition-colors';
-            authNavBtn.href = '#';
-            authNavBtn.onclick = (e) => {
-                e.preventDefault();
+            authNavBtn.classList.remove('hidden');
+            authNavBtn.addEventListener('click', () => {
                 localStorage.removeItem('financeai_token');
                 localStorage.removeItem('financeai_user');
                 window.location.href = '/login';
-            };
+            });
         }
     } else {
         if (mainNav) {
