@@ -1,12 +1,16 @@
 ---
+import { getSession } from 'auth-astro/server';
+
 const pathname = new URL(Astro.request.url).pathname;
 const currentPath = pathname.replace(/^\/|\/$/g, '');
+const session = await getSession(Astro.request);
+const isAuth = !!session;
 ---
 
 <header class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between sticky top-0 z-50 transition-colors duration-300">
     <div class="flex items-center space-x-8">
         <!-- Logo -->
-        <a href="/" class="flex items-center space-x-2.5">
+        <a href={isAuth ? "/dashboard" : "/"} class="flex items-center space-x-2.5">
             <div class="flex space-x-1">
                 <div class="w-2.5 h-2.5 rounded-full bg-blue-600"></div>
                 <div class="w-2.5 h-2.5 rounded-full bg-red-500"></div>
@@ -15,11 +19,15 @@ const currentPath = pathname.replace(/^\/|\/$/g, '');
             <span class="font-bold text-lg tracking-tight text-gray-900 dark:text-white">FinanceAI</span>
         </a>
 
-        <!-- Main Nav (Only visible when user is logged in and not on login page) -->
-        <nav id="mainNav" class="hidden space-x-6 text-sm font-medium">
-            <a href="/"
-                class={`pb-1 transition-colors ${currentPath === '' ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}>
+        <!-- Main Nav (Only visible when user is logged in) -->
+        <nav id="mainNav" class={`space-x-6 text-sm font-medium ${isAuth ? 'flex' : 'hidden'}`}>
+            <a href="/dashboard"
+                class={`pb-1 transition-colors ${currentPath === 'dashboard' ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}>
                 Dashboard
+            </a>
+            <a href="/historial"
+                class={`pb-1 transition-colors ${currentPath === 'historial' ? 'border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 font-semibold' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}>
+                Historial
             </a>
         </nav>
     </div>
@@ -32,9 +40,9 @@ const currentPath = pathname.replace(/^\/|\/$/g, '');
             <span id="backendStatusText">Backend...</span>
         </div>
 
-        <!-- Auth Button (solo visible cuando hay sesión activa, controlado por JS) -->
+        <!-- Auth Button (solo visible cuando hay sesión activa) -->
         <button type="button" id="authNavBtn"
-            class="hidden text-xs font-semibold px-3.5 py-1.5 bg-gray-200 dark:bg-gray-700 hover:bg-red-600 hover:text-white text-gray-800 dark:text-gray-200 rounded-lg transition-colors cursor-pointer">
+            class={`${isAuth ? 'block' : 'hidden'} text-xs font-semibold px-3.5 py-1.5 bg-gray-200 dark:bg-gray-700 hover:bg-red-600 hover:text-white text-gray-800 dark:text-gray-200 rounded-lg transition-colors cursor-pointer`}>
             Cerrar Sesión
         </button>
 
@@ -58,7 +66,7 @@ const currentPath = pathname.replace(/^\/|\/$/g, '');
 
 <script is:inline>
     // Theme toggle
-    document.getElementById('themeToggle').addEventListener('click', () => {
+    document.getElementById('themeToggle')?.addEventListener('click', () => {
         const html = document.documentElement;
         if (html.classList.contains('dark')) {
             html.classList.remove('dark');
@@ -69,7 +77,7 @@ const currentPath = pathname.replace(/^\/|\/$/g, '');
         }
     });
 
-    // Check auth status
+    // Check auth status (client-side token check)
     const token = localStorage.getItem('financeai_token');
     const authNavBtn = document.getElementById('authNavBtn');
     const mainNav = document.getElementById('mainNav');
@@ -77,21 +85,25 @@ const currentPath = pathname.replace(/^\/|\/$/g, '');
     if (token) {
         if (mainNav) {
             mainNav.classList.remove('hidden');
-            mainNav.classList.add('md:flex');
+            mainNav.classList.add('flex');
         }
         if (authNavBtn) {
             authNavBtn.classList.remove('hidden');
-            authNavBtn.addEventListener('click', () => {
-                localStorage.removeItem('financeai_token');
-                localStorage.removeItem('financeai_user');
-                window.location.href = '/login';
-            });
+            authNavBtn.classList.add('block');
         }
-    } else {
-        if (mainNav) {
-            mainNav.classList.add('hidden');
-            mainNav.classList.remove('md:flex');
-        }
+    }
+
+    if (authNavBtn) {
+        authNavBtn.addEventListener('click', async () => {
+            localStorage.removeItem('financeai_token');
+            localStorage.removeItem('financeai_user');
+            try {
+                const { signOut } = await import("auth-astro/client");
+                await signOut({ callbackUrl: '/' });
+            } catch (e) {
+                window.location.href = '/';
+            }
+        });
     }
 
     // Health check polling

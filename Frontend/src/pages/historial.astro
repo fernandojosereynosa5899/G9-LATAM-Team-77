@@ -1,5 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { getSession } from 'auth-astro/server';
+
+const session = await getSession(Astro.request);
 
 // Mocked Data
 const financialScore = 780;
@@ -19,8 +22,8 @@ const debtLevelColor = debtLevel < 30 ? 'bg-green-500' : debtLevel < 60 ? 'bg-ye
 const scoreColor = financialScore > 750 ? 'text-green-600' : financialScore > 600 ? 'text-yellow-600' : 'text-red-600';
 ---
 
-<Layout title="Historial Financiero | FinanceAl">
-    <div class="w-full max-w-7xl mx-auto p-4 md:p-8 flex flex-col gap-8">
+<Layout title="Historial Financiero | FinanceAI">
+    <div id="authCheck" data-has-session={session ? "true" : "false"} class="w-full max-w-7xl mx-auto p-4 md:p-8 flex flex-col gap-8">
         
         <!-- Header Section -->
         <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
@@ -151,9 +154,10 @@ const scoreColor = financialScore > 750 ? 'text-green-600' : financialScore > 60
 </Layout>
 
 <script is:inline>
-    // ─── Proteger Historial: Redirigir a /login si no ha iniciado sesión ───
+    // ─── Proteger Historial: Redirigir a / si no ha iniciado sesión ───
+    const hasSession = document.getElementById('authCheck')?.dataset?.hasSession === 'true';
     const token = localStorage.getItem('financeai_token');
-    if (!token) {
+    if (!token && !hasSession) {
         window.location.href = '/';
     }
 </script>

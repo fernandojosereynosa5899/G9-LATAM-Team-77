@@ -1,9 +1,12 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { getSession } from 'auth-astro/server';
+
+const session = await getSession(Astro.request);
 ---
 
 <Layout title="Dashboard de Análisis | FinanceAI">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div id="authCheck" data-has-session={session ? "true" : "false"} data-user={session?.user ? JSON.stringify(session.user) : ""} class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         <!-- Encabezado -->
         <div class="mb-8">
@@ -177,8 +180,21 @@ import Layout from '../layouts/Layout.astro';
 </Layout>
 
 <script is:inline>
-// ─── Proteger Dashboard: Redirigir a /login si no ha iniciado sesión ───
-if (!localStorage.getItem('financeai_token')) {
+// ─── Proteger Dashboard: Redirigir a / si no ha iniciado sesión ───
+const authCheckEl = document.getElementById('authCheck');
+const hasSession = authCheckEl?.dataset?.hasSession === 'true';
+const token = localStorage.getItem('financeai_token');
+
+if (hasSession && authCheckEl?.dataset?.user) {
+    try {
+        const googleUser = JSON.parse(authCheckEl.dataset.user);
+        if (!localStorage.getItem('financeai_user')) {
+            localStorage.setItem('financeai_user', JSON.stringify({ email: googleUser.email, name: googleUser.name }));
+        }
+    } catch(e) {}
+}
+
+if (!token && !hasSession) {
     window.location.href = '/';
 }
 

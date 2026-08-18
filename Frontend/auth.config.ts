@@ -36,5 +36,12 @@ export default defineConfig({
       }
     })
   ],
+  callbacks: {
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      else if (new URL(url).origin === baseUrl) return url;
+      return `${baseUrl}/dashboard`;
+    }
+  },
   secret: import.meta.env.AUTH_SECRET || "supersecret"
 });

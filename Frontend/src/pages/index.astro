@@ -1,5 +1,11 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { getSession } from 'auth-astro/server';
+
+const session = await getSession(Astro.request);
+if (session) {
+	return Astro.redirect('/dashboard');
+}
 ---
 
 <Layout title="Iniciar Sesión | FinanceAI">
@@ -175,10 +181,10 @@ import Layout from '../layouts/Layout.astro';
 	document.getElementById('googleBtn')?.addEventListener('click', async () => {
 		try {
 			const { signIn } = await import("auth-astro/client");
-			signIn('google');
+			await signIn('google', { callbackUrl: '/dashboard' });
 		} catch (e) {
 			console.error("auth-astro no está disponible, usando fallback", e);
-			window.location.href = '/api/auth/signin/google';
+			window.location.href = '/api/auth/signin/google?callbackUrl=/dashboard';
 		}
 	});
 </script>
