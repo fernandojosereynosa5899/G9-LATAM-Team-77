@@ -19,6 +19,15 @@ public class UserService {
     private final UserRepository userRepository;
     private final PaisRepository paisRepository;
     private final MonedaRepository monedaRepository;
+    private final com.financeia.financeia_backend.repository.TransactionRepository transactionRepository;
+    private final com.financeia.financeia_backend.repository.HistorialAnalisisRepository historialAnalisisRepository;
+
+    @Transactional
+    public void deleteProfile(User user) {
+        transactionRepository.deleteByUser(user);
+        historialAnalisisRepository.deleteByUsuarioId(user.getId());
+        userRepository.delete(user);
+    }
 
     @Transactional
     public UserResponse getProfile(User user) {

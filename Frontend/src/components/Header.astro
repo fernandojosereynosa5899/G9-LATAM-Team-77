@@ -36,10 +36,14 @@ const session = await getSession(Astro.request);
         <!-- Auth Button (Hidden on /) -->
         {currentPath !== '' && currentPath !== '/' && (
             <div class="flex items-center space-x-3">
-                <a href="/" id="authNavBtn"
-                    class="hidden md:inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700">
-                    Iniciar Sesión
-                </a>
+            <a href="#" id="deleteAccountBtn"
+                class="hidden md:inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 transition shadow-sm dark:bg-red-900/30 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-900/50">
+                Eliminar Cuenta
+            </a>
+            <a href="/" id="authNavBtn"
+                class="hidden md:inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700">
+                Iniciar Sesión
+            </a>
                 <!-- Dark mode toggle -->
                 <button id="themeToggle"
                     aria-label="Cambiar tema"
@@ -83,6 +87,34 @@ const session = await getSession(Astro.request);
 
     const authNavBtn = document.getElementById('authNavBtn');
     const mainNav = document.getElementById('mainNav');
+    const deleteAccountBtn = document.getElementById('deleteAccountBtn');
+
+    if (token) {
+        if (deleteAccountBtn) {
+            deleteAccountBtn.classList.remove('hidden');
+            deleteAccountBtn.onclick = async (e) => {
+                e.preventDefault();
+                if (confirm('¿Estás seguro de que deseas eliminar tu cuenta permanentemente? Esta acción no se puede deshacer.')) {
+                    try {
+                        const BACKEND_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:8080' : '';
+                        const res = await fetch(`${BACKEND_URL}/api/v1/users/profile`, {
+                            method: 'DELETE',
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                        if (res.ok || res.status === 204) {
+                            localStorage.removeItem('financeai_token');
+                            localStorage.removeItem('financeai_user');
+                            window.location.href = '/';
+                        } else {
+                            alert('No se pudo eliminar la cuenta.');
+                        }
+                    } catch (err) {
+                        alert('Error de red al eliminar la cuenta.');
+                    }
+                }
+            };
+        }
+    }
 
     if (token || hasGoogleSession) {
         if (mainNav) {

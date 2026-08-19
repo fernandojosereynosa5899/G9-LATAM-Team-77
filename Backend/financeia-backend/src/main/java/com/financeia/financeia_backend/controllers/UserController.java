@@ -37,4 +37,12 @@ public class UserController {
                 userService.updateProfile(user, request)
         );
     }
+
+    @DeleteMapping("/profile")
+    public ResponseEntity<Void> deleteProfile(
+            @AuthenticationPrincipal User user
+    ) {
+        userService.deleteProfile(user);
+        return ResponseEntity.noContent().build();
+    }
 }

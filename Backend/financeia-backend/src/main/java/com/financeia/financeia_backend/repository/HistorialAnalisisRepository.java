@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface HistorialAnalisisRepository extends JpaRepository<HistorialAnalisis, Long> {
     Optional<HistorialAnalisis> findFirstByUsuarioIdOrderByFechaDesc(Long usuarioId);
     List<HistorialAnalisis> findAllByUsuarioIdOrderByFechaDesc(Long usuarioId);
+    void deleteByUsuarioId(Long usuarioId);
 }

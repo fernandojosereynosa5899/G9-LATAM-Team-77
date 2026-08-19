@@ -164,7 +164,7 @@ if (session) {
 					</button>
 				</form>
 
-				<div class="relative mt-6 mb-4">
+				<div id="googleDivider" class="relative mt-6 mb-4">
 					<div class="absolute inset-0 flex items-center">
 						<div class="w-full border-t border-gray-300 dark:border-gray-700"></div>
 					</div>
@@ -263,6 +263,9 @@ if (session) {
 		isRegisterMode = !isRegisterMode;
 		hideAlert();
 
+		const googleBtn = document.getElementById('googleBtn');
+		const googleDivider = document.getElementById('googleDivider');
+
 		if (isRegisterMode) {
 			formTitle.textContent = 'Crear cuenta nueva';
 			formSubtitle.textContent = 'Ingresa tus datos para registrarte';
@@ -272,6 +275,8 @@ if (session) {
 			forgotPasswordContainer.classList.add('hidden');
 			toggleQuestion.textContent = '¿Ya tienes una cuenta?';
 			toggleModeBtn.textContent = 'Inicia sesión';
+			googleBtn?.classList.add('hidden');
+			googleDivider?.classList.add('hidden');
 		} else {
 			formTitle.textContent = 'Bienvenido de nuevo';
 			formSubtitle.textContent = 'Accede a tu panel financiero';
@@ -281,6 +286,8 @@ if (session) {
 			forgotPasswordContainer.classList.remove('hidden');
 			toggleQuestion.textContent = '¿Sin cuenta?';
 			toggleModeBtn.textContent = 'Regístrate gratis';
+			googleBtn?.classList.remove('hidden');
+			googleDivider?.classList.remove('hidden');
 		}
 	});
 
