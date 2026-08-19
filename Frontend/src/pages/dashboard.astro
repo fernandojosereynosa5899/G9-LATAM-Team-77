@@ -1,5 +1,8 @@
 ---
+import { getSession } from 'auth-astro/server';
 import Layout from '../layouts/Layout.astro';
+
+const session = await getSession(Astro.request);
 ---
 
 <Layout title="Dashboard de Análisis | FinanceAI">
@@ -176,9 +179,9 @@ import Layout from '../layouts/Layout.astro';
     </div>
 </Layout>
 
-<script is:inline>
-// ─── Proteger Dashboard: Redirigir a /login si no ha iniciado sesión ───
-if (!localStorage.getItem('financeai_token')) {
+<script is:inline define:vars={{ hasGoogleSession: !!session }}>
+// ─── Proteger Dashboard: Redirigir a / si no hay token de backend ni sesión de Google ───
+if (!hasGoogleSession && !localStorage.getItem('financeai_token')) {
     window.location.href = '/';
 }
 

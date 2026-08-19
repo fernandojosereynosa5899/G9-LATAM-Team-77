@@ -1,9 +1,10 @@
 ---
-const pathname = new URL(Astro.request.url).pathname;
-const currentPath = pathname.replace(/^\/|\/$/g, '');
+import { getSession } from 'auth-astro/server';
+const currentPath = Astro.url.pathname.split('/')[1] || '';
+const session = await getSession(Astro.request);
 ---
 
-<header class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between sticky top-0 z-50 transition-colors duration-300">
+<header data-has-google-session={String(!!session)} class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 px-6 py-4 flex items-center justify-between sticky top-0 z-50 transition-colors duration-300">
     <div class="flex items-center space-x-8">
         <!-- Logo -->
         <a href="/" class="flex items-center space-x-2.5">
@@ -56,15 +57,15 @@ const currentPath = pathname.replace(/^\/|\/$/g, '');
                 </button>
             </div>
         )}
-                    d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/>
-            </svg>
-        </button>
+
     </div>
 </header>
 
-<script is:inline>
+<script>
+    import { signOut } from 'auth-astro/client';
+
     // Theme toggle
-    document.getElementById('themeToggle').addEventListener('click', () => {
+    document.getElementById('themeToggle')?.addEventListener('click', () => {
         const html = document.documentElement;
         if (html.classList.contains('dark')) {
             html.classList.remove('dark');
@@ -77,10 +78,13 @@ const currentPath = pathname.replace(/^\/|\/$/g, '');
 
     // Check auth status
     const token = localStorage.getItem('financeai_token');
+    const headerEl = document.querySelector('header');
+    const hasGoogleSession = headerEl?.dataset.hasGoogleSession === 'true';
+
     const authNavBtn = document.getElementById('authNavBtn');
     const mainNav = document.getElementById('mainNav');
 
-    if (token) {
+    if (token || hasGoogleSession) {
         if (mainNav) {
             mainNav.classList.remove('hidden');
             mainNav.classList.add('md:flex');
@@ -93,10 +97,9 @@ const currentPath = pathname.replace(/^\/|\/$/g, '');
                 e.preventDefault();
                 localStorage.removeItem('financeai_token');
                 localStorage.removeItem('financeai_user');
-                try {
-                    const { signOut } = await import("auth-astro/client");
+                if (hasGoogleSession) {
                     await signOut({ callbackUrl: '/' });
-                } catch (e) {
+                } else {
                     window.location.href = '/';
                 }
             };

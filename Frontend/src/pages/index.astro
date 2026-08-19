@@ -1,5 +1,11 @@
 ---
+import { getSession } from 'auth-astro/server';
 import Layout from '../layouts/Layout.astro';
+
+const session = await getSession(Astro.request);
+if (session) {
+	return Astro.redirect('/dashboard');
+}
 ---
 
 <Layout title="Iniciar Sesión | FinanceAI">
