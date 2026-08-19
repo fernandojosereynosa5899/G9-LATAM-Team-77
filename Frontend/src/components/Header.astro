@@ -32,26 +32,30 @@ const currentPath = pathname.replace(/^\/|\/$/g, '');
             <span id="backendStatusText">Backend...</span>
         </div>
 
-        <!-- Auth Button (Hidden on /login) -->
-        {currentPath !== 'login' && (
-            <a href="/login" id="authNavBtn"
-                class="text-xs font-semibold px-3.5 py-1.5 bg-black hover:bg-gray-800 text-white rounded-lg transition-colors">
-                Iniciar Sesión
-            </a>
+        <!-- Auth Button (Hidden on /) -->
+        {currentPath !== '' && currentPath !== '/' && (
+            <div class="flex items-center space-x-3">
+                <a href="/" id="authNavBtn"
+                    class="hidden md:inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-sm dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700">
+                    Iniciar Sesión
+                </a>
+                <!-- Dark mode toggle -->
+                <button id="themeToggle"
+                    aria-label="Cambiar tema"
+                    class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300">
+                    <!-- Sun icon (dark mode) -->
+                    <svg id="iconSun" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
+                    </svg>
+                    <!-- Moon icon (light mode) -->
+                    <svg id="iconMoon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/>
+                    </svg>
+                </button>
+            </div>
         )}
-
-        <!-- Dark mode toggle -->
-        <button id="themeToggle"
-            aria-label="Cambiar tema"
-            class="w-9 h-9 flex items-center justify-center rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-600 dark:text-gray-300">
-            <!-- Sun icon (dark mode) -->
-            <svg id="iconSun" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"/>
-            </svg>
-            <!-- Moon icon (light mode) -->
-            <svg id="iconMoon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 block dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round"
                     d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/>
             </svg>
         </button>
@@ -85,11 +89,16 @@ const currentPath = pathname.replace(/^\/|\/$/g, '');
             authNavBtn.textContent = 'Cerrar Sesión';
             authNavBtn.className = 'text-xs font-semibold px-3 py-1.5 bg-gray-200 dark:bg-gray-700 hover:bg-red-600 hover:text-white text-gray-800 dark:text-gray-200 rounded-lg transition-colors';
             authNavBtn.href = '#';
-            authNavBtn.onclick = (e) => {
+            authNavBtn.onclick = async (e) => {
                 e.preventDefault();
                 localStorage.removeItem('financeai_token');
                 localStorage.removeItem('financeai_user');
-                window.location.href = '/login';
+                try {
+                    const { signOut } = await import("auth-astro/client");
+                    await signOut({ callbackUrl: '/' });
+                } catch (e) {
+                    window.location.href = '/';
+                }
             };
         }
     } else {

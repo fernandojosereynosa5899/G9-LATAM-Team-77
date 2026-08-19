@@ -86,8 +86,10 @@ const scoreColor = financialScore > 750 ? 'text-green-600' : financialScore > 60
         <section aria-label="Historial de Transacciones" role="region" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="px-6 py-5 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
                 <h3 class="text-lg font-bold text-gray-900">Transacciones Recientes</h3>
-                <div class="flex space-x-2 w-full sm:w-auto">
-                    <input type="text" placeholder="Buscar..." aria-label="Buscar transacciones" class="w-full sm:w-64 px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
+                    <input type="text" placeholder="Buscar..." aria-label="Buscar transacciones" class="w-full sm:w-48 px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                    <input type="date" aria-label="Fecha desde" class="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-gray-600" title="Desde">
+                    <input type="date" aria-label="Fecha hasta" class="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-gray-600" title="Hasta">
                     <select aria-label="Filtrar por categoría" class="px-4 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-gray-600">
                         <option value="">Todas</option>
                         <option value="Ingreso">Ingresos</option>
